@@ -1954,6 +1954,35 @@ cdef class ZFSPool(object):
 
         self.root.write_history('zpool upgrade', self.name)
 
+    IF FREEBSD_VERSION >= 1101511:
+        def channel_program(self, program, timeout=1000, memory_limit=10*1024*1024, nosync=False, **kwargs):
+            cdef int ret
+            cdef const char *c_name
+            cdef const char *c_program = program
+            cdef uint64_t c_timeout = <uint64_t?>timeout
+            cdef uint64_t c_memory_limit = <uint64_t?>memory_limit
+            cdef NVList args = NVList(otherdict=kwargs)
+            cdef nvpair.nvlist_t *out = NULL
+
+            name = self.name
+            c_name = name
+
+            if nosync:
+                with nogil:
+                    ret = libzfs.lzc_channel_program_nosync(c_name, c_program, c_timeout, c_memory_limit, args.handle, &out)
+            else:
+                with nogil:
+                    ret = libzfs.lzc_channel_program(c_name, c_program, c_timeout, c_memory_limit, args.handle, &out)
+
+            if ret != 0:
+                print("warning: ret = %d" % ret)
+
+            # TODO
+            self.root.write_history('zpool program -t %d -m %d' % (timeout, memory_limit), self.name)
+
+            nv = NVList(<uintptr_t>out)
+            return dict(nv)
+
 
 cdef class ZFSImportablePool(ZFSPool):
     cdef NVList nvlist

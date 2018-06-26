@@ -43,6 +43,11 @@ IF FREEBSD_VERSION >= 1000000:
                 LZC_SEND_FLAG_EMBED_DATA
 
             extern int lzc_send_space(const char *, const char *, uint64_t *)
+        IF FREEBSD_VERSION >= 1101511:
+            extern int lzc_channel_program(const char *, const char *, uint64_t,
+                                           uint64_t, nvpair.nvlist_t *, nvpair.nvlist_t **)
+            extern int lzc_channel_program_nosync(const char *, const char *, uint64_t,
+                                                  uint64_t, nvpair.nvlist_t *, nvpair.nvlist_t **)
         extern int lzc_bookmark(nvpair.nvlist_t *bookmarks, nvpair.nvlist_t **errlist)
 
 

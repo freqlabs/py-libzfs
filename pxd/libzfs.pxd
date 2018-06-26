@@ -48,6 +48,9 @@ IF FREEBSD_VERSION >= 1000000:
                                            uint64_t, nvpair.nvlist_t *, nvpair.nvlist_t **)
             extern int lzc_channel_program_nosync(const char *, const char *, uint64_t,
                                                   uint64_t, nvpair.nvlist_t *, nvpair.nvlist_t **)
+        IF FREEBSD_VERSION >= 1101516:
+            extern int lzc_pool_checkpoint(const char *)
+            extern int lzc_pool_checkpoint_discard(const char *)
         extern int lzc_bookmark(nvpair.nvlist_t *bookmarks, nvpair.nvlist_t **errlist)
 
 

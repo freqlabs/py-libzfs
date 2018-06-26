@@ -1983,6 +1983,37 @@ cdef class ZFSPool(object):
             nv = NVList(<uintptr_t>out)
             return dict(nv)
 
+    IF FREEBSD_VERSION >= 1101516:
+        def checkpoint(self):
+            cdef int ret
+            cdef const char *c_name
+
+            name = self.name
+            c_name = name
+
+            with nogil:
+                ret = libzfs.lzc_pool_checkpoint(c_name)
+
+            if ret != 0:
+                raise self.root.get_error()
+
+            self.root.write_history('zpool checkpoint', self.name)
+
+        def checkpoint_discard(self):
+            cdef int ret
+            cdef const char *c_name
+
+            name = self.name
+            c_name = name
+
+            with nogil:
+                ret = libzfs.lzc_pool_checkpoint_discard(c_name)
+
+            if ret != 0:
+                raise self.root.get_error()
+
+            self.root.write_history('zpool checkpoint -d', self.name)
+
 
 cdef class ZFSImportablePool(ZFSPool):
     cdef NVList nvlist
